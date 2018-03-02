@@ -15,7 +15,9 @@ from PreTrainDs import indexData2variable
 def trainVAE_D(epoches,batch_size,data,ds_model,ds_emb,pretrainD=False):
 	# load some necessary model and data
 	gan = torch.load('./Model/gan.pkl')
+	gan.cuda()
 	style = StyleData()
+	
 	style.load('./data/all_style')
 	const = Constants(style.n_words)
 	optimizer = optim.Adam(gan.parameters(),lr=const.Lr)
@@ -30,7 +32,7 @@ def trainVAE_D(epoches,batch_size,data,ds_model,ds_emb,pretrainD=False):
 
     # prepare the train_data
     train_data = indexData2variable(data)
-
+	train_data.cuda()
     # start the training loop
     for i in range(epoches):
         shuffleData(train_data)
@@ -40,7 +42,6 @@ def trainVAE_D(epoches,batch_size,data,ds_model,ds_emb,pretrainD=False):
         count = 0
         while count < len(train_data):
             tempdata = train_data[count:count+batch_size]
-            
             if tempdata == []:
                 break
                 
@@ -96,7 +97,7 @@ def shuffleData(train_data):
 
 if __name__ == "__main__":
 	"""
-	you shuld use this script in this way:
+	you should use this script in this way:
 	python trainVAE_D.py <epoches> <batch_size> <pretrainD?> <traindatafilename>
 
 	for instance: 
@@ -115,7 +116,10 @@ if __name__ == "__main__":
 				'No':False,}
 	ds = torch.load('./Model/Ds.pkl')
 	ds_emb = torch.load('./Model/embedding.pkl')
+	ds.cuda()
+	ds_emb.cuda()
 	train_data = np.load(sys.argv[4])
+	train_data.cuda()
 	epoches = int(sys.argv[1])
 	batch_size = int(sys.argv[2])
 	pretrainD = booldic[sys.argv[3]]
